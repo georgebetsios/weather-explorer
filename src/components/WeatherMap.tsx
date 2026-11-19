@@ -65,7 +65,8 @@ export function WeatherMap({
       className="map"
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution='Weather data by <a href="https://open-meteo.com/">Open-Meteo.com</a> | 
+                    &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <ZoomControl position="bottomright" />
