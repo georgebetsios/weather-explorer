@@ -57,11 +57,18 @@ interface GeocodingResponse {
   }[];
 }
 
+// Ελληνικοί χαρακτήρες: βασικό ελληνικό αλφάβητο + πολυτονικό
+const GREEK_CHARACTERS = /[\u0370-\u03FF\u1F00-\u1FFF]/;
+
+function detectLanguage(text: string): string {
+  return GREEK_CHARACTERS.test(text) ? 'el' : 'en';
+}
+
 export async function searchPlaces(query: string): Promise<Place[]> {
   const params = new URLSearchParams({
     name: query,
     count: '6',
-    language: 'en',
+    language: detectLanguage(query),
     format: 'json',
   });
 
