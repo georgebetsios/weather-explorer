@@ -1,5 +1,8 @@
 import { useForecast } from '../hooks/useForecast';
-import { getWeatherInfo } from '../utils/weatherCodes';
+import { getDailyForecast, getUpcomingHours } from '../utils/forecast';
+import { CurrentConditions } from './CurrentConditions';
+import { HourlyForecast } from './HourlyForecast';
+import { DailyForecast } from './DailyForecast';
 import type { Place } from '../types/weather';
 
 interface WeatherPanelProps {
@@ -8,12 +11,11 @@ interface WeatherPanelProps {
 }
 
 export function WeatherPanel({ place, onClose }: WeatherPanelProps) {
-  const { data, isPending, isError, error } = useForecast(place);
-
+  const { data, isPending, isError, error, refetch } = useForecast(place);
   const subtitle = [place.admin1, place.country].filter(Boolean).join(', ');
 
   return (
-    <aside className="panel">
+    <aside className="panel" aria-label={`Weather for ${place.name}`}>
       <button className="panel-close" onClick={onClose} aria-label="Close">
         ×
       </button>
@@ -21,29 +23,24 @@ export function WeatherPanel({ place, onClose }: WeatherPanelProps) {
       <h2>{place.name}</h2>
       {subtitle && <p className="panel-subtitle">{subtitle}</p>}
 
-      {isPending && <p>Loading weather…</p>}
-      {isError && <p className="error">Could not load weather: {error.message}</p>}
+      {isPending && <p className="panel-status">Loading weather…</p>}
 
-      {data && (() => {
-        const { current } = data;
-        const info = getWeatherInfo(current.weather_code, current.is_day === 1);
-        return (
-          <>
-            <div className="current">
-              <span className="current-icon">{info.icon}</span>
-              <div>
-                <p className="current-temp">{Math.round(current.temperature_2m)}°C</p>
-                <p>{info.label}</p>
-              </div>
-            </div>
-            <ul className="current-details">
-              <li>Feels like {Math.round(current.apparent_temperature)}°C</li>
-              <li>Humidity {current.relative_humidity_2m}%</li>
-              <li>Wind {Math.round(current.wind_speed_10m)} km/h</li>
-            </ul>
-          </>
-        );
-      })()}
+      {isError && (
+        <div className="error">
+          <p>Could not load weather: {error.message}</p>
+          <button type="button" className="retry-button" onClick={() => refetch()}>
+            Try again
+          </button>
+        </div>
+      )}
+
+      {data && (
+        <>
+          <CurrentConditions current={data.current} />
+          <HourlyForecast hours={getUpcomingHours(data)} />
+          <DailyForecast days={getDailyForecast(data)} />
+        </>
+      )}
     </aside>
   );
 }

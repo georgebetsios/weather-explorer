@@ -23,8 +23,9 @@ export interface CurrentWeather {
 export interface HourlyWeather {
   time: string[];
   temperature_2m: number[];
-  precipitation_probability: number[];
+  precipitation_probability: (number | null)[];  // σε κάποιες περιοχές δεν υπάρχει
   weather_code: number[];
+  is_day: number[];
 }
 
 // Ημερήσια δεδομένα: ίδια λογική, αλλά μία τιμή ανά μέρα
@@ -33,7 +34,24 @@ export interface DailyWeather {
   weather_code: number[];
   temperature_2m_max: number[];
   temperature_2m_min: number[];
-  precipitation_probability_max: number[];
+  precipitation_probability_max: (number | null)[];
+}
+
+// Οι «βολικοί» τύποι που θα χρησιμοποιούν τα components
+export interface HourPoint {
+  time: string;
+  temperature: number;
+  precipitationProbability: number | null;
+  weatherCode: number;
+  isDay: boolean;
+}
+
+export interface DayPoint {
+  date: string;
+  weatherCode: number;
+  min: number;
+  max: number;
+  precipitationProbability: number | null;
 }
 
 // Ολόκληρη η απάντηση του Forecast API

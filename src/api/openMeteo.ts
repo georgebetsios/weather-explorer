@@ -31,7 +31,7 @@ export function fetchForecast(latitude: number, longitude: number): Promise<Fore
       'wind_speed_10m',
       'is_day',
     ].join(','),
-    hourly: ['temperature_2m', 'precipitation_probability', 'weather_code'].join(','),
+    hourly: ['temperature_2m', 'precipitation_probability', 'weather_code', 'is_day'].join(','),
     daily: [
       'weather_code',
       'temperature_2m_max',
