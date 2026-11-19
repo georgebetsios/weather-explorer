@@ -30,7 +30,7 @@ Click anywhere on the map, search for a city, or use your current location to se
 ### Install and run
 
 ```bash
-git clone https://github.com/<your-username>/weather-explorer.git
+git clone https://github.com/georgebetsios/weather-explorer.git
 cd weather-explorer
 npm install
 npm run dev
