@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useForecast } from '../hooks/useForecast';
 import { getDailyForecast, getUpcomingHours } from '../utils/forecast';
 import { CurrentConditions } from './CurrentConditions';
@@ -14,17 +15,29 @@ interface WeatherPanelProps {
 
 export function WeatherPanel({ place, isSaved, onToggleSave, onClose }: WeatherPanelProps) {
   const { data, isPending, isError, error, refetch } = useForecast(place);
+
+    // Κλείσιμο του πάνελ με το πλήκτρο Escape
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') onClose();
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown); // cleanup!
+  }, [onClose]);
+  
   const subtitle = [place.admin1, place.country].filter(Boolean).join(', ');
 
-  return (
+    return (
     <aside className="panel" aria-label={`Weather for ${place.name}`}>
-      <button className="panel-close" onClick={onClose} aria-label="Close">
-        ×
-      </button>
+      <header className="panel-header">
+        <button className="panel-close" onClick={onClose} aria-label="Close">
+          ×
+        </button>
+        <h2>{place.name}</h2>
+        {subtitle && <p className="panel-subtitle">{subtitle}</p>}
+      </header>
 
-      <h2>{place.name}</h2>
-      {subtitle && <p className="panel-subtitle">{subtitle}</p>}
-
+      <div className="panel-body">
         <button
           type="button"
           className={`save-button${isSaved ? ' is-saved' : ''}`}
@@ -34,24 +47,25 @@ export function WeatherPanel({ place, isSaved, onToggleSave, onClose }: WeatherP
           {isSaved ? '★ Saved' : '☆ Save to my places'}
         </button>
 
-      {isPending && <p className="panel-status">Loading weather…</p>}
+        {isPending && <p className="panel-status">Loading weather…</p>}
 
-      {isError && (
-        <div className="error">
-          <p>Could not load weather: {error.message}</p>
-          <button type="button" className="retry-button" onClick={() => refetch()}>
-            Try again
-          </button>
-        </div>
-      )}
+        {isError && (
+          <div className="error">
+            <p>Could not load weather: {error.message}</p>
+            <button type="button" className="retry-button" onClick={() => refetch()}>
+              Try again
+            </button>
+          </div>
+        )}
 
-      {data && (
-        <>
-          <CurrentConditions current={data.current} />
-          <HourlyForecast hours={getUpcomingHours(data)} />
-          <DailyForecast days={getDailyForecast(data)} />
-        </>
-      )}
+        {data && (
+          <>
+            <CurrentConditions current={data.current} />
+            <HourlyForecast hours={getUpcomingHours(data)} />
+            <DailyForecast days={getDailyForecast(data)} />
+          </>
+        )}
+      </div>
     </aside>
   );
 }

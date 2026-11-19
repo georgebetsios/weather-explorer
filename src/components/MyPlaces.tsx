@@ -23,7 +23,10 @@ export function MyPlaces({
   onRemove,
 }: MyPlacesProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('added');
-  const [isCollapsed, setIsCollapsed] = useState(false);
+    // Σε μικρές οθόνες η λίστα ξεκινάει κλειστή, για να φαίνεται ο χάρτης
+  const [isCollapsed, setIsCollapsed] = useState(
+    () => window.matchMedia('(max-width: 700px)').matches,
+  );
 
   // [...places] = αντίγραφο, γιατί η .sort() αλλάζει τον αρχικό πίνακα!
     const sortedPlaces =

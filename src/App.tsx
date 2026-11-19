@@ -44,13 +44,17 @@ function App() {
 
       <div className="toolbar">
         <SearchBar onSelect={showPlace} />
-        <button
+                <button
           type="button"
           className="locate-button"
           onClick={location.locate}
           disabled={location.status === 'locating'}
+          aria-label="Show weather at my location"
         >
-          {location.status === 'locating' ? 'Locating…' : '📍 My location'}
+          <span aria-hidden="true">📍</span>
+          <span className="locate-label">
+            {location.status === 'locating' ? 'Locating…' : 'My location'}
+          </span>
         </button>
         {location.status === 'error' && <p className="toolbar-error">{location.error}</p>}
       </div>
