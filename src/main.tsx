@@ -5,13 +5,15 @@ import 'leaflet/dist/leaflet.css';
 import './index.css';
 import App from './App.tsx';
 
+// Open-Meteo updates its data roughly every 15 minutes, so refetching more often
+// gives us nothing new. Caching like this also keeps us within the free API limits.
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 10 * 60 * 1000,   // 10 λεπτά: τα δεδομένα θεωρούνται «φρέσκα»
-      gcTime: 30 * 60 * 1000,      // 30 λεπτά: μετά σβήνονται από τη μνήμη
-      refetchOnWindowFocus: false, // μην ξαναζητάς δεδομένα κάθε φορά που γυρνάς στο tab
-      retry: 1,                    // σε αποτυχία, ξαναδοκίμασε μία φορά
+      staleTime: 10 * 60 * 1000, // data is considered fresh for 10 minutes
+      gcTime: 30 * 60 * 1000, // unused data is removed from the cache after 30 minutes
+      refetchOnWindowFocus: false,
+      retry: 1,
     },
   },
 });

@@ -16,8 +16,11 @@ export function HourlyForecast({ hours }: HourlyForecastProps) {
           return (
             <li key={hour.time} className="hour">
               <span className="hour-time">{index === 0 ? 'Now' : formatHour(hour.time)}</span>
-              <span className="hour-icon" title={info.label}>{info.icon}</span>
+              <span className="hour-icon" title={info.label}>
+                {info.icon}
+              </span>
               <span className="hour-temp">{formatTemperature(hour.temperature)}</span>
+              {/* Ternary instead of && so a 0% value doesn't render a "0" on the page */}
               {hour.precipitationProbability ? (
                 <span className="hour-rain">💧{hour.precipitationProbability}%</span>
               ) : null}

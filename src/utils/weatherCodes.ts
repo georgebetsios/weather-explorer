@@ -3,7 +3,8 @@ interface WeatherInfo {
   icon: string;
 }
 
-// Record<number, WeatherInfo> = «αντικείμενο με κλειδιά αριθμούς και τιμές WeatherInfo»
+// WMO weather codes used by Open-Meteo
+// https://open-meteo.com/en/docs (see "WMO Weather interpretation codes")
 const WEATHER_CODES: Record<number, WeatherInfo> = {
   0: { label: 'Clear sky', icon: '☀️' },
   1: { label: 'Mainly clear', icon: '🌤️' },
@@ -38,7 +39,7 @@ const WEATHER_CODES: Record<number, WeatherInfo> = {
 export function getWeatherInfo(code: number, isDay = true): WeatherInfo {
   const info = WEATHER_CODES[code] ?? { label: 'Unknown', icon: '❓' };
 
-  // Τη νύχτα, το «ήλιος» δεν έχει νόημα
+  // Show a moon instead of a sun at night
   if (!isDay && (code === 0 || code === 1)) {
     return { ...info, icon: '🌙' };
   }

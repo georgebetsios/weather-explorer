@@ -19,9 +19,12 @@ interface WeatherMapProps {
   onSelectPlace: (place: Place) => void;
 }
 
+// react-leaflet hooks only work inside <MapContainer>, so this is a separate component
 function ClickHandler({ onMapClick }: { onMapClick: WeatherMapProps['onMapClick'] }) {
   useMapEvents({
     click(event) {
+      // wrap() keeps the longitude between -180 and 180 when the map has been
+      // dragged around the world
       const { lat, lng } = event.latlng.wrap();
       onMapClick(lat, lng);
     },
@@ -29,12 +32,12 @@ function ClickHandler({ onMapClick }: { onMapClick: WeatherMapProps['onMapClick'
   return null;
 }
 
-// Κάθε φορά που αλλάζει το focusPlace, κινεί τον χάρτη εκεί με animation
 function FlyToPlace({ place }: { place: Place | null }) {
-  const map = useMap(); // πρόσβαση στο αντικείμενο του Leaflet
+  const map = useMap();
 
   useEffect(() => {
     if (!place) return;
+    // Zoom in to at least level 9, but don't zoom out if the user is already closer
     map.flyTo([place.latitude, place.longitude], Math.max(map.getZoom(), 9), {
       duration: 1.2,
     });
@@ -51,7 +54,7 @@ export function WeatherMap({
   onMapClick,
   onSelectPlace,
 }: WeatherMapProps) {
-  // Αν το επιλεγμένο μέρος είναι αποθηκευμένο, έχει ήδη marker, οπότε δεν χρειάζεται κύκλος
+  // Saved places already have a marker, so they don't need the extra circle
   const selectedIsSaved =
     selectedPlace !== null && savedPlaces.some((place) => place.id === selectedPlace.id);
 
@@ -61,12 +64,11 @@ export function WeatherMap({
       zoom={3}
       minZoom={2}
       worldCopyJump
-      zoomControl={false}
+      zoomControl={false} // added again at the bottom right, the top left is used by the search
       className="map"
     >
       <TileLayer
-        attribution='Weather data by <a href="https://open-meteo.com/">Open-Meteo.com</a> | 
-                    &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution='Weather data by <a href="https://open-meteo.com/">Open-Meteo.com</a> | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <ZoomControl position="bottomright" />
@@ -80,6 +82,7 @@ export function WeatherMap({
         onSelect={onSelectPlace}
       />
 
+      {/* CircleMarker is drawn with SVG, so it avoids Leaflet's default marker image issue with Vite */}
       {selectedPlace && !selectedIsSaved && (
         <CircleMarker
           center={[selectedPlace.latitude, selectedPlace.longitude]}

@@ -2,6 +2,8 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { fetchCurrentForPlaces, roundCoord } from '../api/openMeteo';
 import type { Place } from '../types/weather';
 
+// Current weather for all saved places, fetched with a single batch request.
+// Note: adding or removing a place changes the key, so all places are fetched again.
 export function usePlacesWeather(places: Place[]) {
   return useQuery({
     queryKey: [
@@ -10,6 +12,6 @@ export function usePlacesWeather(places: Place[]) {
     ],
     queryFn: () => fetchCurrentForPlaces(places),
     enabled: places.length > 0,
-    placeholderData: keepPreviousData, // όσο έρχονται νέα, δείξε τις παλιές θερμοκρασίες
+    placeholderData: keepPreviousData, // keep showing old temperatures while new ones load
   });
 }

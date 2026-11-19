@@ -9,18 +9,22 @@ import { usePlacesWeather } from './hooks/usePlacesWeather';
 import type { Place } from './types/weather';
 
 function App() {
+  // The place shown in the weather panel
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
+  // The place the map should fly to (only set for search, location and the places list)
   const [focusPlace, setFocusPlace] = useState<Place | null>(null);
 
   const saved = useSavedPlaces();
   const savedWeather = usePlacesWeather(saved.places);
 
+  // Used when the place might be far away, so we also move the map there
   function showPlace(place: Place) {
     setSelectedPlace(place);
     setFocusPlace(place);
   }
 
   function handleMapClick(latitude: number, longitude: number) {
+    // Open-Meteo has no reverse geocoding, so clicked points are named by their coordinates
     setSelectedPlace({
       id: `${latitude.toFixed(2)},${longitude.toFixed(2)}`,
       name: `${latitude.toFixed(2)}°, ${longitude.toFixed(2)}°`,
@@ -39,12 +43,13 @@ function App() {
         savedPlaces={saved.places}
         savedWeather={savedWeather.data}
         onMapClick={handleMapClick}
-        onSelectPlace={setSelectedPlace}   // κλικ σε marker: επιλογή χωρίς "πτήση"
+        // The marker is already visible, so there is no need to move the map
+        onSelectPlace={setSelectedPlace}
       />
 
       <div className="toolbar">
         <SearchBar onSelect={showPlace} />
-                <button
+        <button
           type="button"
           className="locate-button"
           onClick={location.locate}
@@ -64,7 +69,7 @@ function App() {
         weather={savedWeather.data}
         isError={savedWeather.isError}
         selectedPlaceId={selectedPlace?.id ?? null}
-        onSelect={showPlace}               // κλικ στη λίστα: επιλογή ΚΑΙ "πτήση"
+        onSelect={showPlace}
         onRemove={saved.removePlace}
       />
 

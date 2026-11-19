@@ -1,7 +1,8 @@
 import type { Place } from '../types/weather';
 
-// Τα id είναι τα ίδια που επιστρέφει το Geocoding API (GeoNames IDs),
-// ώστε αν ο χρήστης ψάξει π.χ. "London", να αναγνωρίζεται ως ήδη αποθηκευμένο.
+// Shown on the first visit so the map isn't empty and users can compare
+// Users can remove any of them.
+// for one of these cities shows it as already saved.
 export const DEFAULT_PLACES: Place[] = [
   { id: '2643743', name: 'London', country: 'United Kingdom', latitude: 51.51, longitude: -0.13 },
   { id: '5128581', name: 'New York', country: 'United States', latitude: 40.71, longitude: -74.01 },

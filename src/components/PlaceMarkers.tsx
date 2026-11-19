@@ -7,8 +7,9 @@ import type { CurrentSnapshot, Place } from '../types/weather';
 function createWeatherIcon(snapshot: CurrentSnapshot | undefined, isSelected: boolean) {
   const info = snapshot ? getWeatherInfo(snapshot.weatherCode, snapshot.isDay) : null;
 
-  // ΠΡΟΣΟΧΗ: εδώ γράφουμε HTML ως string. Βάζουμε ΜΟΝΟ δικά μας δεδομένα
-  // (εικονίδιο, αριθμό), ΠΟΤΕ ονόματα από το API (κίνδυνος XSS).
+  // This HTML string is not escaped by React, so only our own values go in here
+  // (icon and number). Place names come from the API and are rendered in the
+  // Tooltip below instead, to avoid XSS.
   const html = `
     <div class="weather-marker${isSelected ? ' is-selected' : ''}">
       <span>${info ? info.icon : '⏳'}</span>
@@ -18,9 +19,9 @@ function createWeatherIcon(snapshot: CurrentSnapshot | undefined, isSelected: bo
 
   return L.divIcon({
     html,
-    className: 'weather-marker-wrapper', // αντικαθιστά το default στυλ του Leaflet
+    className: 'weather-marker-wrapper', // replaces Leaflet's default white box style
     iconSize: [64, 30],
-    iconAnchor: [32, 15],                // το κέντρο του εικονιδίου «πατάει» στο σημείο
+    iconAnchor: [32, 15], // center the marker on the point
   });
 }
 
@@ -41,7 +42,6 @@ export function PlaceMarkers({ places, weather, selectedPlaceId, onSelect }: Pla
           icon={createWeatherIcon(weather?.[place.id], place.id === selectedPlaceId)}
           eventHandlers={{ click: () => onSelect(place) }}
         >
-          {/* Το Tooltip το ζωγραφίζει η React, άρα το όνομα είναι ασφαλές εδώ */}
           <Tooltip direction="top" offset={[0, -14]}>
             {place.name}
           </Tooltip>

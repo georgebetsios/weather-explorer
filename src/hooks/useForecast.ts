@@ -4,13 +4,14 @@ import type { Place } from '../types/weather';
 
 export function useForecast(place: Place | null) {
   return useQuery({
-    // Το "κλειδί" του cache: ίδιες στρογγυλεμένες συντεταγμένες = ίδια δεδομένα
+    // Same rounded coordinates = same cache entry
     queryKey: [
       'forecast',
       place ? roundCoord(place.latitude) : null,
       place ? roundCoord(place.longitude) : null,
     ],
+    // Safe to use "!" here because the query only runs when place is not null
     queryFn: () => fetchForecast(place!.latitude, place!.longitude),
-    enabled: place !== null, // αν δεν υπάρχει μέρος, μην κάνεις request
+    enabled: place !== null,
   });
 }

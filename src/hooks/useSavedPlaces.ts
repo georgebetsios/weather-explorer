@@ -7,24 +7,24 @@ const STORAGE_KEY = 'weather-explorer:saved-places';
 function loadPlaces(): Place[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    // Αν δεν υπάρχει τίποτα αποθηκευμένο = πρώτη επίσκεψη → προεπιλεγμένες πόλεις
+    // Nothing stored means this is the first visit, so show the default cities.
+    // If the user removed everything, "[]" is stored and we respect that.
     return stored ? (JSON.parse(stored) as Place[]) : DEFAULT_PLACES;
   } catch {
-    // Χαλασμένο JSON ή μπλοκαρισμένο storage (π.χ. private mode)
+    // Broken JSON or storage blocked (e.g. some private browsing modes)
     return DEFAULT_PLACES;
   }
 }
 
 export function useSavedPlaces() {
-  // Lazy initializer: η loadPlaces τρέχει ΜΟΝΟ στο πρώτο render
+  // Passing the function (not calling it) means localStorage is only read on the first render
   const [places, setPlaces] = useState<Place[]>(loadPlaces);
 
-  // Κάθε φορά που αλλάζει η λίστα, την αποθηκεύουμε
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(places));
     } catch {
-      // Αν το storage είναι γεμάτο ή απενεργοποιημένο, απλώς δεν αποθηκεύουμε
+      // Storage is full or disabled, the app still works without saving
     }
   }, [places]);
 
@@ -35,8 +35,8 @@ export function useSavedPlaces() {
   function togglePlace(place: Place) {
     setPlaces((current) =>
       current.some((p) => p.id === place.id)
-        ? current.filter((p) => p.id !== place.id)  // υπάρχει → αφαίρεσέ το
-        : [...current, place],                     // δεν υπάρχει → πρόσθεσέ το
+        ? current.filter((p) => p.id !== place.id)
+        : [...current, place],
     );
   }
 

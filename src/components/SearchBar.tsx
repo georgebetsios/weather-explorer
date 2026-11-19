@@ -11,6 +11,8 @@ export function SearchBar({ onSelect }: SearchBarProps) {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
+  // `query` updates on every key press (for the input),
+  // `debouncedQuery` only after the user stops typing (for the API)
   const debouncedQuery = useDebounce(query, 300);
   const { data: results = [], isFetching, isError } = usePlaceSearch(debouncedQuery);
 
@@ -34,6 +36,7 @@ export function SearchBar({ onSelect }: SearchBarProps) {
           setIsOpen(true);
         }}
         onKeyDown={(event) => {
+          // Enter picks the first result, Escape closes the list
           if (event.key === 'Enter' && results.length > 0) handleSelect(results[0]);
           if (event.key === 'Escape') setIsOpen(false);
         }}
@@ -49,6 +52,7 @@ export function SearchBar({ onSelect }: SearchBarProps) {
 
           {results.map((place) => (
             <li key={place.id}>
+              {/* Buttons so the results also work with the keyboard */}
               <button type="button" onClick={() => handleSelect(place)}>
                 <strong>{place.name}</strong>
                 <span>{[place.admin1, place.country].filter(Boolean).join(', ')}</span>

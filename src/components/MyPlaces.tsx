@@ -23,18 +23,19 @@ export function MyPlaces({
   onRemove,
 }: MyPlacesProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('added');
-    // Σε μικρές οθόνες η λίστα ξεκινάει κλειστή, για να φαίνεται ο χάρτης
+  // Start collapsed on small screens so the map stays visible
   const [isCollapsed, setIsCollapsed] = useState(
     () => window.matchMedia('(max-width: 700px)').matches,
   );
 
-  // [...places] = αντίγραφο, γιατί η .sort() αλλάζει τον αρχικό πίνακα!
-    const sortedPlaces =
+  // We copy the array first because reverse() and sort() change the original array
+  const sortedPlaces =
     sortOrder === 'added'
-      ? [...places].reverse()   // τα πιο πρόσφατα πρώτα
+      ? [...places].reverse() // most recently added first
       : [...places].sort((a, b) => {
           const tempA = weather?.[a.id]?.temperature;
           const tempB = weather?.[b.id]?.temperature;
+          // Places without data yet go to the end
           if (tempA === undefined) return 1;
           if (tempB === undefined) return -1;
           return sortOrder === 'warmest' ? tempB - tempA : tempA - tempB;

@@ -19,6 +19,7 @@ export function CurrentConditions({ current }: CurrentConditionsProps) {
         </div>
       </div>
 
+      {/* Local time of the place, not the user's time */}
       <p className="local-time">Local time {formatHour(current.time)}</p>
 
       <ul className="current-details">

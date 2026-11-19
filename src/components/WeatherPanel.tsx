@@ -16,19 +16,21 @@ interface WeatherPanelProps {
 export function WeatherPanel({ place, isSaved, onToggleSave, onClose }: WeatherPanelProps) {
   const { data, isPending, isError, error, refetch } = useForecast(place);
 
-    // Κλείσιμο του πάνελ με το πλήκτρο Escape
+  // Close the panel with the Escape key
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') onClose();
     }
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown); // cleanup!
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
-  
+
+  // filter(Boolean) removes missing parts
   const subtitle = [place.admin1, place.country].filter(Boolean).join(', ');
 
-    return (
+  return (
     <aside className="panel" aria-label={`Weather for ${place.name}`}>
+      {/* Sticky header, so the name and close button stay visible while scrolling */}
       <header className="panel-header">
         <button className="panel-close" onClick={onClose} aria-label="Close">
           ×
