@@ -114,15 +114,10 @@ src/
 
 With more time I would:
 
-- **Weather layers on the map** – a temperature or precipitation overlay, so users see weather across whole regions, not only at saved points.
-- **Time slider** – scrub through the next hours/days and watch all markers update, like an animated TV forecast.
-- **Reverse geocoding** for clicked points (e.g. with Nominatim).
-- **Tests** – unit tests for the data transforms and component tests with Vitest + React Testing Library, mocking the API with MSW.
-- **Unit and language settings** (°C/°F, km/h/mph, full i18n).
-- **Shareable URLs** – keep the selected place in the URL so a view can be shared.
-- **Richer comparison** – a side-by-side chart of saved places over the coming days.
-- **Marker clustering** for users with many saved places, and drag-to-reorder for the list.
-- **PWA / offline support** showing the last known data.
+- **Add tests** for the main parts of the app, like the forecast data and the search.
+- **Show real names for clicked points** instead of coordinates.
+- **Add a °C / °F switch.**
+- **Add a time slider**, so users can see how the weather on the map changes over the next hours, like a TV forecast.
 
 ---
 
