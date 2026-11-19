@@ -7,10 +7,12 @@ import type { Place } from '../types/weather';
 
 interface WeatherPanelProps {
   place: Place;
+  isSaved: boolean;
+  onToggleSave: (place: Place) => void;
   onClose: () => void;
 }
 
-export function WeatherPanel({ place, onClose }: WeatherPanelProps) {
+export function WeatherPanel({ place, isSaved, onToggleSave, onClose }: WeatherPanelProps) {
   const { data, isPending, isError, error, refetch } = useForecast(place);
   const subtitle = [place.admin1, place.country].filter(Boolean).join(', ');
 
@@ -22,6 +24,15 @@ export function WeatherPanel({ place, onClose }: WeatherPanelProps) {
 
       <h2>{place.name}</h2>
       {subtitle && <p className="panel-subtitle">{subtitle}</p>}
+
+        <button
+          type="button"
+          className={`save-button${isSaved ? ' is-saved' : ''}`}
+          onClick={() => onToggleSave(place)}
+          aria-pressed={isSaved}
+        >
+          {isSaved ? '★ Saved' : '☆ Save to my places'}
+        </button>
 
       {isPending && <p className="panel-status">Loading weather…</p>}
 

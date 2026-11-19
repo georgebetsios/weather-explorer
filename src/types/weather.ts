@@ -63,3 +63,9 @@ export interface ForecastResponse {
   hourly: HourlyWeather;
   daily: DailyWeather;
 }
+
+export interface CurrentSnapshot {
+  temperature: number;
+  weatherCode: number;
+  isDay: boolean;
+}

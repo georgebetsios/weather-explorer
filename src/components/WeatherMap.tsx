@@ -7,12 +7,16 @@ import {
   useMap,
   useMapEvents,
 } from 'react-leaflet';
-import type { Place } from '../types/weather';
+import { PlaceMarkers } from './PlaceMarkers';
+import type { CurrentSnapshot, Place } from '../types/weather';
 
 interface WeatherMapProps {
   selectedPlace: Place | null;
-  focusPlace: Place | null;   // το μέρος στο οποίο πρέπει να "πετάξει" ο χάρτης
+  focusPlace: Place | null;
+  savedPlaces: Place[];
+  savedWeather: Record<string, CurrentSnapshot> | undefined;
   onMapClick: (latitude: number, longitude: number) => void;
+  onSelectPlace: (place: Place) => void;
 }
 
 function ClickHandler({ onMapClick }: { onMapClick: WeatherMapProps['onMapClick'] }) {
@@ -39,14 +43,25 @@ function FlyToPlace({ place }: { place: Place | null }) {
   return null;
 }
 
-export function WeatherMap({ selectedPlace, focusPlace, onMapClick }: WeatherMapProps) {
+export function WeatherMap({
+  selectedPlace,
+  focusPlace,
+  savedPlaces,
+  savedWeather,
+  onMapClick,
+  onSelectPlace,
+}: WeatherMapProps) {
+  // Αν το επιλεγμένο μέρος είναι αποθηκευμένο, έχει ήδη marker, οπότε δεν χρειάζεται κύκλος
+  const selectedIsSaved =
+    selectedPlace !== null && savedPlaces.some((place) => place.id === selectedPlace.id);
+
   return (
     <MapContainer
       center={[30, 10]}
       zoom={3}
       minZoom={2}
       worldCopyJump
-      zoomControl={false}   // βγάζουμε το default (πάνω αριστερά, εκεί θα μπει η αναζήτηση)
+      zoomControl={false}
       className="map"
     >
       <TileLayer
@@ -57,7 +72,14 @@ export function WeatherMap({ selectedPlace, focusPlace, onMapClick }: WeatherMap
       <ClickHandler onMapClick={onMapClick} />
       <FlyToPlace place={focusPlace} />
 
-      {selectedPlace && (
+      <PlaceMarkers
+        places={savedPlaces}
+        weather={savedWeather}
+        selectedPlaceId={selectedPlace?.id ?? null}
+        onSelect={onSelectPlace}
+      />
+
+      {selectedPlace && !selectedIsSaved && (
         <CircleMarker
           center={[selectedPlace.latitude, selectedPlace.longitude]}
           radius={8}

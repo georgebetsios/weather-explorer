@@ -1,4 +1,4 @@
-import type { ForecastResponse, Place } from '../types/weather';
+import type { CurrentSnapshot, ForecastResponse, Place } from '../types/weather';
 
 const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
 const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1/search';
@@ -83,4 +83,44 @@ export async function searchPlaces(query: string): Promise<Place[]> {
     latitude: r.latitude,
     longitude: r.longitude,
   }));
+}
+
+interface CurrentOnlyResponse {
+  current: {
+    temperature_2m: number;
+    weather_code: number;
+    is_day: number;
+  };
+}
+
+// Φέρνει τον τρέχοντα καιρό για ΠΟΛΛΑ μέρη με ΕΝΑ request.
+// Επιστρέφει αντικείμενο: { [place.id]: CurrentSnapshot }
+export async function fetchCurrentForPlaces(
+  places: Place[],
+): Promise<Record<string, CurrentSnapshot>> {
+  if (places.length === 0) return {};
+
+  const params = new URLSearchParams({
+    latitude: places.map((place) => roundCoord(place.latitude)).join(','),
+    longitude: places.map((place) => roundCoord(place.longitude)).join(','),
+    current: 'temperature_2m,weather_code,is_day',
+  });
+
+  const data = await getJson<CurrentOnlyResponse | CurrentOnlyResponse[]>(
+    `${FORECAST_URL}?${params}`,
+  );
+
+  // Με 1 τοποθεσία το API επιστρέφει αντικείμενο, με πολλές επιστρέφει πίνακα
+  const list = Array.isArray(data) ? data : [data];
+
+  // Τα αποτελέσματα έρχονται με την ίδια σειρά που στείλαμε τα μέρη
+  const result: Record<string, CurrentSnapshot> = {};
+  list.forEach((item, index) => {
+    result[places[index].id] = {
+      temperature: item.current.temperature_2m,
+      weatherCode: item.current.weather_code,
+      isDay: item.current.is_day === 1,
+    };
+  });
+  return result;
 }

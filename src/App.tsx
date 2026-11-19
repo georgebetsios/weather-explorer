@@ -2,20 +2,24 @@ import { useState } from 'react';
 import { WeatherMap } from './components/WeatherMap';
 import { WeatherPanel } from './components/WeatherPanel';
 import { SearchBar } from './components/SearchBar';
+import { MyPlaces } from './components/MyPlaces';
 import { useCurrentLocation } from './hooks/useCurrentLocation';
+import { useSavedPlaces } from './hooks/useSavedPlaces';
+import { usePlacesWeather } from './hooks/usePlacesWeather';
 import type { Place } from './types/weather';
 
 function App() {
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [focusPlace, setFocusPlace] = useState<Place | null>(null);
 
-  // Για αναζήτηση και GPS: επιλέγουμε το μέρος ΚΑΙ μετακινούμε τον χάρτη
+  const saved = useSavedPlaces();
+  const savedWeather = usePlacesWeather(saved.places);
+
   function showPlace(place: Place) {
     setSelectedPlace(place);
     setFocusPlace(place);
   }
 
-  // Για κλικ: επιλέγουμε το μέρος, ο χάρτης μένει ακίνητος
   function handleMapClick(latitude: number, longitude: number) {
     setSelectedPlace({
       id: `${latitude.toFixed(2)},${longitude.toFixed(2)}`,
@@ -32,7 +36,10 @@ function App() {
       <WeatherMap
         selectedPlace={selectedPlace}
         focusPlace={focusPlace}
+        savedPlaces={saved.places}
+        savedWeather={savedWeather.data}
         onMapClick={handleMapClick}
+        onSelectPlace={setSelectedPlace}   // κλικ σε marker: επιλογή χωρίς "πτήση"
       />
 
       <div className="toolbar">
@@ -48,8 +55,22 @@ function App() {
         {location.status === 'error' && <p className="toolbar-error">{location.error}</p>}
       </div>
 
+      <MyPlaces
+        places={saved.places}
+        weather={savedWeather.data}
+        isError={savedWeather.isError}
+        selectedPlaceId={selectedPlace?.id ?? null}
+        onSelect={showPlace}               // κλικ στη λίστα: επιλογή ΚΑΙ "πτήση"
+        onRemove={saved.removePlace}
+      />
+
       {selectedPlace && (
-        <WeatherPanel place={selectedPlace} onClose={() => setSelectedPlace(null)} />
+        <WeatherPanel
+          place={selectedPlace}
+          isSaved={saved.isSaved(selectedPlace.id)}
+          onToggleSave={saved.togglePlace}
+          onClose={() => setSelectedPlace(null)}
+        />
       )}
     </div>
   );
