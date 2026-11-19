@@ -4,9 +4,8 @@ Explore the weather anywhere in the world, the way a TV weather presenter would 
 
 Click anywhere on the map, search for a city, or use your current location to see the weather there. Save the places you discover and they appear on the map with their live conditions, so you can build up your own picture of the world's weather and compare places at a glance.
 
-**Live demo:** _<add your deployment URL here>_
+**Live demo:** https://weather-explorer-henna.vercel.app
 
-![Screenshot](./screenshot.png)
 
 ## Features
 
